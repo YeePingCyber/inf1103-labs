@@ -3,7 +3,7 @@ error_count = 0
 
 while True:
     stock_quantity = input("Please input the stock quantity (input 'quit' to exit the program): ")
-    if stock_quantity == "quit":
+    if stock_quantity.lower() == "quit":
         print("The current stock count is:", original_count)
         print("The final Failed/Rejected entries count:", error_count)
         break
