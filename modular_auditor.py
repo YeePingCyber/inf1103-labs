@@ -1,5 +1,4 @@
 max_cap = 500
-tax_rate = 0.1
 
 def process_deliver(current_total, new_value):
     current_total += new_value
@@ -11,13 +10,13 @@ def process_deliver(current_total, new_value):
         return "limit_reach"
 
 def calculate_tax(amount):
-    return amount*tax_rate
+    return amount*0.1
 
 def generate_report(total_unit, failed_attempts):
     deliver_tax = calculate_tax(total_unit)
 
     print("The number of deliveries processes:", total_unit)
-    print("The delivery tax:", deliver_tax)
+    print("The delivery tax:", f"{deliver_tax:.1f}")
     print("The final Failed/Rejected entries count:", failed_attempts)
 
 def get_valid_input():
