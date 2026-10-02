@@ -151,6 +151,7 @@ def main():
         if user_input == "5":
             save_inventory(inventory)
             print("Saving inventory...")
+            
             print("Inventory saved successfully to inventory.json.")
 
         if user_input == "6":
