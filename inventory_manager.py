@@ -153,6 +153,7 @@ def main():
             print("Saving inventory...")
             print("Inventory saved successfully to inventory.json.")
 
+        # Exit program
         if user_input == "6":
             save_inventory(inventory)
             break
