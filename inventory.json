@@ -9,7 +9,7 @@
         "id": "P002",
         "name": "Mouse",
         "price": 25.5,
-        "stock": "50"
+        "stock": 50
     },
     {
         "id": "P003",
@@ -21,12 +21,6 @@
         "id": "P004",
         "name": "Monitor",
         "price": 299.99,
-        "stock": 10
-    },
-    {
-        "id": "P005",
-        "name": "PC",
-        "price": 2000.0,
         "stock": 10
     }
 ]

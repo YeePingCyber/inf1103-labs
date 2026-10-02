@@ -56,7 +56,7 @@ def update_stock(inventory, product_id):
             new_stock = input("\nNew Stock Quantity: ")
             
             if new_stock.isdigit():
-                inventory[i]["stock"] = new_stock
+                inventory[i]["stock"] = int(new_stock)
                 print("\nStock updated successfully!")
                 return inventory
             else:
