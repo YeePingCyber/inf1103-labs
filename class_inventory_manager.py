@@ -19,6 +19,37 @@ class Product():
     def display_information(self):
         print(f"ID: {self.__product_id} | Name: {self.__name} | Price: ${self.__price:.2f} | Stock: {self.__stock}")
 
+# Inventory Class
+class Inventory():
+    def __init__(self):
+        self.__product_list: list[Product]
+
+    # Add Product class into the list
+    def add_product(self, product: Product):
+        self.__product_list.append(product)
+
+    # Search product by ID
+    def search_product(self, id):
+        product_found = False
+        for product in self.__product_list:
+            if product.get_product_id() == id:
+                print("Product Found")
+                print("----------------------------")
+                product.display_information()
+                print("----------------------------")
+                product_found = True
+                break
+
+        if not product_found:
+            print("\nProduct Not Found")
+        
+    # Display all product
+    def display_all(self):
+        print("Current Inventory")
+        print("----------------------------")
+        for product in self.__product_list:
+            product.display_information()
+        print("----------------------------")
 
 def load_inventory():
     inventory = []
