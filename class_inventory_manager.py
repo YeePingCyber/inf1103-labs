@@ -218,7 +218,6 @@ class Main():
             self.__file_handling.saves_inventory(self.__load_inventory)
             return True
 
-
 if __name__ == "__main__":
     # main()
     is_exit = False
