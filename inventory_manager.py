@@ -1,9 +1,10 @@
 import json
+from abc import ABC, abstractmethod
 
 inventory_file = "inventory.json"
 
 # Product Class
-class Product():
+class Product(ABC):
     def __init__(self, product_id: str, name: str, price: float, stock: int):
         self.__product_id = product_id
         self.__name = name
@@ -28,13 +29,56 @@ class Product():
     def display_information(self):
         print(f"ID: {self.__product_id} | Name: {self.__name} | Price: ${self.__price:.2f} | Stock: {self.__stock}")
 
+    @abstractmethod
+    def get_fulfilment_info(self) -> str:
+        pass
+
+class CanBeShipped(ABC):
+    @abstractmethod
+    def calculate_shipping_cost(self) -> float:
+        pass
+
+# Physical Product Class
+class PhysicalProduct(Product, CanBeShipped):
+    def __init__(self, product_id, name, price, stock, weight: float):
+        super().__init__(product_id, name, price, stock)
+        self.__weight = weight
+
+    def get_weight(self):
+        return self.__weight
+
+    def display_information(self):
+        print(f"ID: {self.get_product_id()} | Name: {self.get_name()} | Price: ${self.get_price():.2f} | Stock: {self.get_stock()} | Weight: {self.__weight}")
+
+    def get_fulfilment_info(self):
+        return "Requires physical shipping."
+
+    def calculate_shipping_cost(self):
+        shipping_cost = self.get_price()*0.1
+        return shipping_cost
+
+# Digital Product Class
+class DigitalProduct(Product):
+    def __init__(self, product_id, name, price, stock, download_size: float):
+        super().__init__(product_id, name, price, stock)
+        self.__download_size = download_size
+
+    def get_download_size(self):
+        return self.__download_size
+    
+    def display_information(self):
+        print(f"ID: {self.get_product_id()} | Name: {self.get_name()} | Price: ${self.get_price():.2f} | Stock: {self.get_stock()} | Download Size: {self.__download_size}")
+
+    def get_fulfilment_info(self):
+        return "Requires delivered digitally"
+    
 # Inventory Class
 class Inventory():
     def __init__(self):
-        self.__product_list: list[Product] = []
+        self.__product_list: list[PhysicalProduct|DigitalProduct] = []
 
     # Add Product class into the list
-    def add_product(self, product: Product):
+    def add_product(self, product: PhysicalProduct|DigitalProduct):
         self.__product_list.append(product)
 
     # Retrieve Product listing
@@ -78,7 +122,13 @@ class FileHandling():
 
         if inventory_list and status == 200:
             for inventory in inventory_list:
-                product = Product(inventory["id"],inventory["name"],inventory["price"],inventory["stock"])
+                product = ""
+                if inventory.get("category") == "physical":
+                    product = PhysicalProduct(inventory["id"],inventory["name"],inventory["price"],inventory["stock"],inventory["weight"])
+
+                if inventory.get("category") == "digital":
+                    product = DigitalProduct(inventory["id"],inventory["name"],inventory["price"],inventory["stock"],inventory["download_size"])
+
                 self.__inventory.add_product(product)
 
         return self.__inventory
@@ -87,8 +137,15 @@ class FileHandling():
         product_list = inventory.get_product_list()
 
         list_product = []
+        
         for product in product_list:
-            list_product.append({"id": product.get_product_id(), "name": product.get_name(), "price": product.get_price(), "stock": product.get_stock()})
+            if isinstance(product, PhysicalProduct):
+                list_product.append({"id": product.get_product_id(), "name": product.get_name(),"category": "physical", "price": product.get_price(), "stock": product.get_stock(), "weight": product.get_weight()})
+
+            if isinstance(product, DigitalProduct):
+                list_product.append({"id": product.get_product_id(), "name": product.get_name(),"category": "digital", "price": product.get_price(), "stock": product.get_stock(), "download_size": product.get_download_size()})
+
+            
 
         with open(inventory_file, "w") as f:
             json.dump(list_product, f, indent=4)
@@ -98,8 +155,6 @@ class Main():
     def __init__(self):
         self.__file_handling = FileHandling()
         self.__load_inventory = self.__file_handling.loads_inventory()
-
-        
 
     def menu(self):
         print("================================")
@@ -113,7 +168,18 @@ class Main():
         print("5. Save Inventory")
         print("6. Exit")
         print("-----------------------")
-    
+
+    def __check_float_type(self, user_input):
+        try:
+            user_input = float(user_input)
+
+            if user_input > 0:
+                return True
+
+            return -1
+        except:
+            return False
+
     # Get user input
     def get_user_input(self):
         option = input("\nEnter option: ")
@@ -135,8 +201,53 @@ class Main():
         # Add new product
         if option == "2":
             print("\nAdd New Product")
+            while True:
+                print("\nPlease indicate Physical Product or Digital Product: ")
+                print("1. Physical Product")
+                print("2. Digital Product")
+                product_category_option = input("Please input the options (1 or 2): ")
+
+                if product_category_option == "1":
+                    product_category = "physical"
+                    break
+
+                if product_category_option == "2":
+                    product_category = "digital"
+                    break
+
+                print("Please input the options given")
+
             product_id = input("Product ID: ")
             product_name = input("Product Name: ")
+
+            if product_category == "physical":
+                while True:
+                    product_weight = input("Product Weight: ")
+
+                    if self.__check_float_type(product_weight) == 1:
+                        product_weight = float(product_weight)
+                        break
+
+                    if self.__check_float_type(product_weight) == -1:
+                        print("Product weight needs to be more than 0.")
+
+                    if self.__check_float_type(product_weight) == 0:
+                        print("Please input a valid product weight.")
+
+
+            if product_category == "digital":
+                while True:
+                    product_download_size = input("Product Download Size: ")
+
+                    if self.__check_float_type(product_download_size) == 1:
+                        product_download_size = float(product_download_size)
+                        break
+
+                    if self.__check_float_type(product_download_size) == -1:
+                        print("Product download size needs to be more than 0.")
+
+                    if self.__check_float_type(product_download_size) == 0:
+                        print("Please input a valid product download size.")
 
             while True:
                 price = input("Price: ")
@@ -166,8 +277,13 @@ class Main():
                     print("Stock number cannot be negative")
                 except:
                     print("Please enter a valid stock number")
-            
-            product = Product(product_id, product_name, float(price), int(stock))
+
+            if product_category == "physical":
+                product = PhysicalProduct(product_id, product_name, float(price), int(stock), float(product_weight))
+
+            if product_category == "digital":
+                product = DigitalProduct(product_id, product_name, float(price), int(stock), float(product_download_size))
+
             self.__load_inventory.add_product(product)
 
             print("\nProduct added successfully!")
@@ -201,6 +317,10 @@ class Main():
                 print("\nProduct Found")
                 print("-------------------")
                 searched_product.display_information()
+                print(f"\n{searched_product.get_fulfilment_info()}")
+
+                if isinstance(searched_product, PhysicalProduct):
+                    print(f"\nThe shipping cost of this product is {searched_product.calculate_shipping_cost():.2f}")
                 print("-------------------")
             else:
                 print("\nProduct Not Found")
@@ -221,7 +341,6 @@ class Main():
             return True
 
 if __name__ == "__main__":
-    # main()
     is_exit = False
     main_class = Main()
 
