@@ -14,5 +14,29 @@
         "price": 1200.0,
         "stock": 10,
         "download_size": 100.0
+    },
+    {
+        "id": "P003",
+        "name": "Mouse",
+        "category": "physical",
+        "price": 25.5,
+        "stock": 50,
+        "weight": 0.5
+    },
+    {
+        "id": "P004",
+        "name": "Keyboard",
+        "category": "physical",
+        "price": 45.0,
+        "stock": 25,
+        "weight": 1.0
+    },
+    {
+        "id": "P005",
+        "name": "Monitor",
+        "category": "physical",
+        "price": 299.99,
+        "stock": 20,
+        "weight": 2.0
     }
 ]
