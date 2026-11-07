@@ -1,6 +1,6 @@
 from Product import Product
 # Inventory Class
-class Inventory():
+class Inventory:
     def __init__(self):
         self.__product_list: list[Product] = []
 
@@ -19,6 +19,13 @@ class Inventory():
                 return product
 
         return ""
+
+    # Remove product
+    def remove_product(self, product_id: str):
+        for i in range(len(self.__product_list)):
+            if self.__product_list[i].get_product_id() == product_id:
+                deleted_product = self.__product_list.pop(i)
+                print(f"{deleted_product.get_name()} has been deleted successfully")
         
     # Display all product
     def display_all(self):

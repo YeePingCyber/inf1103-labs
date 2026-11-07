@@ -5,7 +5,12 @@
         "category": "physical",
         "price": 1200.0,
         "stock": 10,
-        "weight": 1.5
+        "weight": 1.5,
+        "supplier": {
+            "supplier_id": "S01",
+            "name": "Dell",
+            "contact_email": "dell@gmail.com"
+        }
     },
     {
         "id": "P002",
@@ -13,7 +18,12 @@
         "category": "digital",
         "price": 1200.0,
         "stock": 10,
-        "download_size": 100.0
+        "download_size": 100.0,
+        "supplier": {
+            "supplier_id": "S01",
+            "name": "Dell",
+            "contact_email": "dell@gmail.com"
+        }
     },
     {
         "id": "P003",
@@ -21,7 +31,12 @@
         "category": "physical",
         "price": 25.5,
         "stock": 50,
-        "weight": 0.5
+        "weight": 0.5,
+        "supplier": {
+            "supplier_id": "S01",
+            "name": "Dell",
+            "contact_email": "dell@gmail.com"
+        }
     },
     {
         "id": "P004",
@@ -29,14 +44,11 @@
         "category": "physical",
         "price": 45.0,
         "stock": 25,
-        "weight": 1.0
-    },
-    {
-        "id": "P005",
-        "name": "Monitor",
-        "category": "physical",
-        "price": 299.99,
-        "stock": 20,
-        "weight": 2.0
+        "weight": 1.0,
+        "supplier": {
+            "supplier_id": "S01",
+            "name": "Dell",
+            "contact_email": "dell@gmail.com"
+        }
     }
 ]

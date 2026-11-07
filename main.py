@@ -1,8 +1,10 @@
 from FileHandling import FileHandling
-from Product import PhysicalProduct, DigitalProduct
+from PhysicalProduct import PhysicalProduct
+from DigitalProduct import DigitalProduct
+from Supplier import Supplier
 
 # Main Class
-class Main():
+class Main:
     def __init__(self):
         self.__file_handling = FileHandling()
         self.__load_inventory = self.__file_handling.loads_inventory()
@@ -16,8 +18,10 @@ class Main():
         print("2. Add Product")
         print("3. Update Stock")
         print("4. Search Product")
-        print("5. Save Inventory")
-        print("6. Exit")
+        print("5. Remove Product")
+        print("6. Add Order")
+        print("7. Save Inventory")
+        print("8. Exit")
         print("-----------------------")
 
     def __check_float_type(self, user_input):
@@ -129,11 +133,17 @@ class Main():
                 except:
                     print("Please enter a valid stock number")
 
+            supplier_id = input("Supplier ID: ")
+            supplier_name = input("Supplier name: ")
+            contact_email = input("Contact Email: ")
+
+            supplier = Supplier(supplier_id, supplier_name, contact_email)
+            
             if product_category == "physical":
-                product = PhysicalProduct(product_id, product_name, float(price), int(stock), float(product_weight))
+                product = PhysicalProduct(product_id, product_name, float(price), int(stock), float(product_weight), supplier)
 
             if product_category == "digital":
-                product = DigitalProduct(product_id, product_name, float(price), int(stock), float(product_download_size))
+                product = DigitalProduct(product_id, product_name, float(price), int(stock), float(product_download_size), supplier)
 
             self.__load_inventory.add_product(product)
 
@@ -164,22 +174,46 @@ class Main():
             product_id = input("Enter Product ID: ")
             searched_product = self.__load_inventory.search_product(product_id)
 
+            supplier_info = searched_product.get_supplier()
+
             if searched_product:
                 print("\nProduct Found")
-                print("-------------------")
+                print("--------------------------------------")
                 searched_product.display_information()
                 print(f"\n{searched_product.get_fulfilment_info()}")
 
                 if isinstance(searched_product, PhysicalProduct):
-                    print(f"\nThe shipping cost of this product is {searched_product.calculate_shipping_cost():.2f}")
-                print("-------------------")
+                    print("--------------------------------------")
+                    print(f"The shipping cost of this product is {searched_product.calculate_shipping_cost():.2f}")
+
+                print("--------------------------------------")
+                supplier_info.display_information()
+                print("--------------------------------------")
             else:
                 print("\nProduct Not Found")
 
             return False
 
-        # Save Inventory
+        # remove Product
         if option == "5":
+            print("\nRemove Product")
+            product_id = input("Enter Product ID: ")
+            searched_product = self.__load_inventory.search_product(product_id)
+
+            if searched_product:
+                confirmation = input("Are you sure you want to remove this product (Y/N): ")
+
+                if confirmation.lower() == "y":
+                    self.__load_inventory.remove_product(product_id)
+                else:
+                    print("The product has not been remove")
+            else:
+                print("\nProduct Not Found")
+
+            return False
+        
+        # Save Inventory
+        if option == "6":
             self.__file_handling.saves_inventory(self.__load_inventory)
 
             print("Saving inventory...")
@@ -187,7 +221,7 @@ class Main():
             return False
 
         # Exit program
-        if option == "6":
+        if option == "7":
             self.__file_handling.saves_inventory(self.__load_inventory)
             return True
 
