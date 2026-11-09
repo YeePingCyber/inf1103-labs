@@ -9,9 +9,9 @@ from Supplier import Supplier
 class FileHandling:
     def __init__(self):
         self.__inventory: Inventory = Inventory()
-        self.__inventory_file = "inventory.json"
-        self.__supplier_file = "supplier.json"
-        self.__deleted_file = "deleted.json"
+        self.__inventory_file: str = "inventory.json"
+        self.__supplier_file: str = "supplier.json"
+        self.__deleted_file: str = "deleted.json"
         
 
     def loads_inventory(self) -> Inventory:

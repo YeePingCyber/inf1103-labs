@@ -17,7 +17,7 @@ class Inventory:
         return self.__deleted_product
     
     # Search product by ID
-    def search_product(self, id) -> Product|None:
+    def search_product(self, id) -> Product:
         for product in self.__product_list:
             if product.get_product_id() == id:
                 return product
