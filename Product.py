@@ -32,5 +32,5 @@ class Product(ABC):
         print(f"ID: {self.__product_id} | Name: {self.__name} | Price: ${self.__price:.2f} | Stock: {self.__stock}")
 
     @abstractmethod
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         pass
