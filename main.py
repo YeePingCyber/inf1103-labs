@@ -2,14 +2,17 @@ from FileHandling import FileHandling
 from PhysicalProduct import PhysicalProduct
 from DigitalProduct import DigitalProduct
 from Supplier import Supplier
+from Inventory import Inventory
+from Order import Order
 
 # Main Class
 class Main:
     def __init__(self):
-        self.__file_handling = FileHandling()
-        self.__load_inventory = self.__file_handling.loads_inventory()
+        self.__file_handling: FileHandling = FileHandling()
+        self.__load_inventory: Inventory = self.__file_handling.loads_inventory()
+        self.__orders: list[Order] = []
 
-    def menu(self):
+    def menu(self) -> None:
         print("================================")
         print("INVENTORY MANAGEMENT SYSTEM")
         print("================================")
@@ -20,11 +23,12 @@ class Main:
         print("4. Search Product")
         print("5. Remove Product")
         print("6. Add Order")
-        print("7. Save Inventory")
-        print("8. Exit")
+        print("7. Remove Order")
+        print("8. Save Inventory")
+        print("9. Exit")
         print("-----------------------")
 
-    def __check_float_type(self, user_input):
+    def __check_float_type(self, user_input) -> bool:
         try:
             user_input = float(user_input)
 
@@ -36,11 +40,11 @@ class Main:
             return False
 
     # Get user input
-    def get_user_input(self):
+    def get_user_input(self) -> bool:
         option = input("\nEnter option: ")
 
         if option.isdigit():
-            if int(option) > 6:
+            if int(option) > 9:
                 print("Please follow the options given in the menu.")
                 return False
             
@@ -174,9 +178,8 @@ class Main:
             product_id = input("Enter Product ID: ")
             searched_product = self.__load_inventory.search_product(product_id)
 
-            supplier_info = searched_product.get_supplier()
-
             if searched_product:
+                supplier_info = searched_product.get_supplier()
                 print("\nProduct Found")
                 print("--------------------------------------")
                 searched_product.display_information()
@@ -212,8 +215,60 @@ class Main:
 
             return False
         
-        # Save Inventory
+        # Add OrderLine
         if option == "6":
+            print("Add Order")
+            order_id = input("Order ID: ")
+
+            add_more = True
+
+            order = Order(order_id)
+            while add_more:
+                product_id = input("Product ID: ")
+
+                searched_product = self.__load_inventory.search_product(product_id)
+                
+                if searched_product:
+                    quantity = input("Quantity: ")
+                    order.add_order_line(searched_product, int(quantity))
+
+                    print("\nOrder added successfully.")
+                else:
+                    print("\nProduct Not Found")
+
+                is_continue = input("Do you want to buy more products. (Y/N): ")
+
+                if is_continue.lower() == "n":
+                    add_more = False
+
+            # Calculate total
+            self.__orders.append(order)
+            order.display_order_lines()
+            print(f"The total amount: ${order.calculate_total():.2f}")
+
+        # Remove OrderLine
+        if option == "7":
+            print("Remove Order")
+            order_id = input("Order ID: ")
+            product_id = input("Product ID: ")
+            order_lines = []
+
+            for order in self.__orders:
+                if order.get_order_id() == order_id:
+                    searched_order = order
+                    order_lines = searched_order.get_order_lines()
+
+            for i in range(len(order_lines)):
+                if order_lines[i].get_product().get_product_id() == product_id:
+                    
+                    searched_order.remove_order_lines(i)
+                    searched_order.display_order_lines()
+                    break
+
+            return False
+
+        # Save Inventory
+        if option == "8":
             self.__file_handling.saves_inventory(self.__load_inventory)
 
             print("Saving inventory...")
@@ -221,7 +276,7 @@ class Main:
             return False
 
         # Exit program
-        if option == "7":
+        if option == "9":
             self.__file_handling.saves_inventory(self.__load_inventory)
             return True
 

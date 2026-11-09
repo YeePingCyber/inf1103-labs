@@ -1,0 +1,22 @@
+[
+    {
+        "supplier_id": "S01",
+        "name": "Supplier 1",
+        "contact_email": "supplier_1@gmail.com"
+    },
+    {
+        "supplier_id": "S02",
+        "name": "Supplier 2",
+        "contact_email": "supplier_2@gmail.com"
+    },
+    {
+        "supplier_id": "S03",
+        "name": "Supplier 3",
+        "contact_email": "supplier_3@gmail.com"
+    },
+    {
+        "supplier_id": "S04",
+        "name": "Figma",
+        "contact_email": "figma@gmail.com"
+    }
+]
