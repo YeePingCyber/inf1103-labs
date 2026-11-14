@@ -9,5 +9,11 @@ COPY Product.py .
 COPY CanBeShipped.py .
 COPY Order.py .
 COPY OrderLine.py .
+COPY BulkDiscount.py .
+COPY DiscountStrategy.py .
+COPY NoDiscount.py .
+COPY PercentageDiscount.py .
+COPY StudentDiscount.py .
+COPY ProductFactory.py .
 COPY main.py .
 CMD ["python", "main.py"]

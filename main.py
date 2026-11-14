@@ -224,7 +224,7 @@ class Main:
                     break
 
                 if discount_option == "2":
-                    percentage = self.__get_positive_float("Please input a percentage")
+                    percentage = self.__get_positive_float("Please input a percentage: ")
                     order.set_discount(PercentageDiscount(percentage))
                     print(f"{percentage}% discount has been applied")
                     break
@@ -295,8 +295,8 @@ class Main:
                         product = ProductFactory.create(row[0], row[1], row[2], row[3], row[4], 25.0, supplier)
                         inventory.add_product(product)
                         loaded += 1
-                    except ValueError:
-                        print(f"Unknown product type: {row[0]}")
+                    except ValueError as e:
+                        print(e)
                     continue
             print(f"{loaded} Products loaded")
         finally:
@@ -307,17 +307,17 @@ if __name__ == "__main__":
     is_exit = False
     main_class = Main()
 
-    # while not is_exit:
-    #     main_class.menu()
-    #     is_exit = main_class.get_user_input()
+    while not is_exit:
+        main_class.menu()
+        is_exit = main_class.get_user_input()
 
-    # print("Saving inventory before exit...")
-    # print("Inventory saved successfully.\n")
-    # print("Thank you for using Inventory Management System.")
-    # print("Program terminated.")
+    print("Saving inventory before exit...")
+    print("Inventory saved successfully.\n")
+    print("Thank you for using Inventory Management System.")
+    print("Program terminated.")
 
 
     # Run only the load product fucntion
-    inventory = Inventory()
-    supplier = Supplier("S01", "Test", "Test@gmail.com")
-    main_class.load_product("products.csv", inventory, supplier)
+    # inventory = Inventory()
+    # supplier = Supplier("S01", "Test", "Test@gmail.com")
+    # main_class.load_product("products.csv", inventory, supplier)
