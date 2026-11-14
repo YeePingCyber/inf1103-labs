@@ -4,6 +4,7 @@ from Inventory import Inventory
 from PhysicalProduct import PhysicalProduct
 from DigitalProduct import DigitalProduct
 from Supplier import Supplier
+from ProductFactory import ProductFactory
 
 # File Handling Class
 class FileHandling:
@@ -36,12 +37,15 @@ class FileHandling:
                 for supplier in supplier_list:
                     if inventory["supplier_id"] == supplier["supplier_id"]:
                         supplier = Supplier(supplier["supplier_id"], supplier["name"], supplier["contact_email"])
-
+                        
                         if inventory.get("category") == "physical":
-                            product = PhysicalProduct(inventory["id"],inventory["name"],inventory["price"],inventory["stock"],inventory["weight"], supplier)
+                            extra_value = inventory["weight"]
 
                         if inventory.get("category") == "digital":
-                            product = DigitalProduct(inventory["id"],inventory["name"],inventory["price"],inventory["stock"],inventory["download_size"], supplier)
+                            extra_value = inventory["download_size"]
+
+                        product = ProductFactory.create(inventory.get("category"), inventory["id"], inventory["name"], inventory["price"], inventory["stock"], extra_value, supplier)
+                        
 
                         self.__inventory.add_product(product)
 

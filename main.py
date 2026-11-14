@@ -4,6 +4,13 @@ from DigitalProduct import DigitalProduct
 from Supplier import Supplier
 from Inventory import Inventory
 from Order import Order
+from NoDiscount import NoDiscount
+from PercentageDiscount import PercentageDiscount
+from BulkDiscount import BulkDiscount
+from StudentDiscount import StudentDiscount
+from ProductFactory import ProductFactory
+
+import csv
 
 # Main Class
 class Main:
@@ -28,16 +35,31 @@ class Main:
         print("9. Exit")
         print("-----------------------")
 
-    def __check_float_type(self, user_input) -> bool:
-        try:
-            user_input = float(user_input)
+    def __get_positive_float(self, prompt: str) -> float:
+        while True:
+            try:
+                value = float(input(prompt))
 
-            if user_input > 0:
-                return True
+                if value <= 0:
+                    print("Please enter a number greater than zero.")
+                    continue
 
-            return -1
-        except:
-            return False
+                return value
+            except ValueError:
+                print("Please enter a valid number, e.g. 12.50")
+
+    def __get_positive_int(self, prompt: str) -> int:
+        while True:
+            try:
+                value = int(input(prompt))
+
+                if value <= 0:
+                    print("Please enter a number greater than zero.")
+                    continue
+
+                return value
+            except ValueError:
+                print("Please enter a valid number, e.g. 12")
 
     # Get user input
     def get_user_input(self) -> bool:
@@ -80,74 +102,24 @@ class Main:
             product_name = input("Product Name: ")
 
             if product_category == "physical":
-                while True:
-                    product_weight = input("Product Weight: ")
-
-                    if self.__check_float_type(product_weight) == 1:
-                        product_weight = float(product_weight)
-                        break
-
-                    if self.__check_float_type(product_weight) == -1:
-                        print("Product weight needs to be more than 0.")
-
-                    if self.__check_float_type(product_weight) == 0:
-                        print("Please input a valid product weight.")
-
+                extra_value = self.__get_positive_float("Product Weight: ")
 
             if product_category == "digital":
-                while True:
-                    product_download_size = input("Product Download Size: ")
+                extra_value = self.__get_positive_float("Product Download Size: ")
 
-                    if self.__check_float_type(product_download_size) == 1:
-                        product_download_size = float(product_download_size)
-                        break
 
-                    if self.__check_float_type(product_download_size) == -1:
-                        print("Product download size needs to be more than 0.")
+            price = self.__get_positive_float("Price: ")
 
-                    if self.__check_float_type(product_download_size) == 0:
-                        print("Please input a valid product download size.")
+            stock = self.__get_positive_int("Stock Quantity: ")
 
-            while True:
-                price = input("Price: ")
-
-                try:
-                    price = float(price)
-                    
-                    if price > 0.0:
-                        break
-
-                    if price == 0.0:
-                        print("Price cannot be 0")
-                        continue
-
-                    print("Price cannot be negative")
-                except:
-                    print("Please enter a valid price")
-
-            while True:
-                stock = input("Stock Quantity: ")
-
-                try:
-                    stock = int(stock)
-                    if stock >= 0:
-                        break
-
-                    print("Stock number cannot be negative")
-                except:
-                    print("Please enter a valid stock number")
 
             supplier_id = input("Supplier ID: ")
             supplier_name = input("Supplier name: ")
             contact_email = input("Contact Email: ")
 
             supplier = Supplier(supplier_id, supplier_name, contact_email)
-            
-            if product_category == "physical":
-                product = PhysicalProduct(product_id, product_name, float(price), int(stock), float(product_weight), supplier)
 
-            if product_category == "digital":
-                product = DigitalProduct(product_id, product_name, float(price), int(stock), float(product_download_size), supplier)
+            product = ProductFactory.create(product_category, product_id, product_name, price, stock, extra_value, supplier)
 
             self.__load_inventory.add_product(product)
 
@@ -162,13 +134,8 @@ class Main:
             searched_product = self.__load_inventory.search_product(product_id)
 
             if searched_product:
-                new_stock = input("\nNew Stock Quantity: ")
-                            
-                if new_stock.isdigit():
-                    searched_product.update_stock(int(new_stock))
-                    print("\nStock updated successfully!")
-                else:
-                    print("\nPlease input a valid stock value.")
+                new_stock = self.__get_positive_int("\nNew Stock Quantity: ")
+                searched_product.update_stock(new_stock)
 
             return False
 
@@ -222,15 +189,15 @@ class Main:
 
             add_more = True
 
-            order = Order(order_id)
+            order = Order(order_id, NoDiscount())
             while add_more:
                 product_id = input("Product ID: ")
 
                 searched_product = self.__load_inventory.search_product(product_id)
                 
                 if searched_product:
-                    quantity = input("Quantity: ")
-                    order.add_order_line(searched_product, int(quantity))
+                    quantity = self.__get_positive_int("Quantity: ")
+                    order.add_order_line(searched_product, quantity)
 
                     print("\nOrder added successfully.")
                 else:
@@ -240,6 +207,39 @@ class Main:
 
                 if is_continue.lower() == "n":
                     add_more = False
+
+            # Get discount
+            while True:
+                print("Select the discount")
+                print("1. Bulk Discount")
+                print("2. Percent Discount")
+                print("3. Student Discount")
+                print("4. No Discount")
+
+                discount_option = input("Discount option: ")
+
+                if discount_option == "1":
+                    order.set_discount(BulkDiscount(200,20))
+                    print("Bulk discount has been applied")
+                    break
+
+                if discount_option == "2":
+                    percentage = self.__get_positive_float("Please input a percentage")
+                    order.set_discount(PercentageDiscount(percentage))
+                    print(f"{percentage}% discount has been applied")
+                    break
+
+                if discount_option == "3":
+                    order.set_discount(StudentDiscount(5))
+                    print("Student discount has been applied")
+                    break
+
+                if discount_option == "4":
+                    print("No discount applied")
+                    break
+
+                print("Please input the options given in the menu")
+
 
             # Calculate total
             self.__orders.append(order)
@@ -280,15 +280,44 @@ class Main:
             self.__file_handling.saves_inventory(self.__load_inventory)
             return True
 
+    def load_product(self, path: str, inventory: Inventory, supplier: Supplier) -> None:
+        loaded = 0
+        try:
+            file = open(path, newline="")
+        except FileNotFoundError:
+            print(f"Products file not found: {path}")
+        else:
+            with file:
+                reader = csv.reader(file)
+                next(reader)
+                for row in reader:
+                    try:
+                        product = ProductFactory.create(row[0], row[1], row[2], row[3], row[4], 25.0, supplier)
+                        inventory.add_product(product)
+                        loaded += 1
+                    except ValueError:
+                        print(f"Unknown product type: {row[0]}")
+                    continue
+            print(f"{loaded} Products loaded")
+        finally:
+            print("Load attempt finished.")
+
+
 if __name__ == "__main__":
     is_exit = False
     main_class = Main()
 
-    while not is_exit:
-        main_class.menu()
-        is_exit = main_class.get_user_input()
+    # while not is_exit:
+    #     main_class.menu()
+    #     is_exit = main_class.get_user_input()
 
-    print("Saving inventory before exit...")
-    print("Inventory saved successfully.\n")
-    print("Thank you for using Inventory Management System.")
-    print("Program terminated.")
+    # print("Saving inventory before exit...")
+    # print("Inventory saved successfully.\n")
+    # print("Thank you for using Inventory Management System.")
+    # print("Program terminated.")
+
+
+    # Run only the load product fucntion
+    inventory = Inventory()
+    supplier = Supplier("S01", "Test", "Test@gmail.com")
+    main_class.load_product("products.csv", inventory, supplier)
